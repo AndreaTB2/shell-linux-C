@@ -107,11 +107,20 @@ struct cmd * parse_commands(char * line) {
 void execute(struct cmd * clist) {
   int pid, npid, stat;
 
+  if(strcmp(clist->exe_path, "pwd") == 0){
+  	pwd();
+  }
+  if (strcmp(clist->exe_path, "cd") == 0){
+  	
+  	cd(clist->arg[1]);
+     }
   pid = fork();
   if (pid == -1) {
     perror("dumbshell:fork");
     exit(1);
   }
+
+  
   if (!pid) {
     /* child */
     execvp(clist -> exe_path, clist -> arg);
@@ -128,7 +137,7 @@ void execute(struct cmd * clist) {
     execute(clist -> next);
   }
 }
-void CWD(){
+int pwd(){
    char current_dir[400];
     if(getcwd(current_dir , sizeof(current_dir)) == NULL){
         printf("error occur!");
@@ -137,6 +146,33 @@ void CWD(){
     }
     return 0;
 }
+
+int cd(char cmd[100]) {
+
+    //char cmd[50] = "cd /home/andrea/Documents/";
+    
+    char current_dir[100];
+    
+    printf("directory before changing");
+    getcwd(current_dir, sizeof(current_dir));   //directory before changing
+    printf("%s\n", current_dir);
+    
+    char *h1 = strtok(cmd," "); 	// we split the string into two parts
+    h1 = strtok(NULL, " ");		// this takes the second part of the command after the space
+    int check = chdir(h1);		//chdir returns 0 if successful and -1 if path does not exist
+    printf("%d\n",check);
+     if(check == 0){			//path found
+    	chdir(h1);
+    	printf("directory after changing");
+    	getcwd(current_dir, sizeof(current_dir));
+    	printf("%s\n", current_dir);		//directory after changing
+    }
+    else				//path not found
+    	perror("path not available");
+
+    return 0; //success
+}
+
 
 void free_commands(struct cmd * clist) {
   struct cmd * nxt;
