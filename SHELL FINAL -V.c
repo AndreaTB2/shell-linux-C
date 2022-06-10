@@ -130,7 +130,7 @@ void PS() {
   DIR * directory;
   struct dirent * ptr;
 
-  printf("   PID\tTTY\tTime\t    CMD\n");
+  printf("   PID\t TTY\tTime\t    CMD\n");
   
     directory = opendir("/proc"); 	//open the dirctory
 
@@ -163,6 +163,9 @@ void procRead(int pid) {
   sprintf(pathFile, "/proc/%d/fd/0", pid); //stores in the array 
   fd = open(pathFile, 'r'); //open the file 0
   tty = ttyname(fd); //gets the terminal name from the fd
+  
+  if(tty == NULL)
+  	tty = "     ?";
 
   if (tty != NULL) {	//some ttys have null value
     FILE * statFile;
